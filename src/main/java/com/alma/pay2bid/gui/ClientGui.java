@@ -73,12 +73,7 @@ public class ClientGui {
      * Initialize the GUI & populate it with the base elements
      */
     private void createGui() {
-        // Create the Main JFrame
-        mainFrame = new JFrame("Pay2Bid - Auction");
-        Dimension dimension = new Dimension(500, 500);
-        mainFrame.setSize(500, 500);
-        mainFrame.setMaximumSize(dimension);
-        mainFrame.setLayout(new BorderLayout());
+        
 
         // block pour définir le nom du client
         boolean hasName = false;
@@ -86,27 +81,35 @@ public class ClientGui {
         JPanel panel = new JPanel();
         JLabel lbl = new JLabel("Entrez votre nom: ");
         JTextField txt = new JTextField(10);
+        String text = "";
         panel.add(lbl);
         panel.add(txt);
 
-        while (hasName == false) {
-
-        int selectedOption = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
-
-        if(selectedOption == 0)
-        {
-        String text = txt.getText();
-          if (text.length() > 1 ) {
-            hasName = true;
-            try {
-              client.setName(text);
-            } catch (RemoteException e) {
-              e.printStackTrace();
-            }
-            JOptionPane.showMessageDialog(mainFrame, "Bonjour " + text + '!');
-          }
-        }
-      }
+		while (hasName == false) {
+		
+			int selectedOption = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
+			
+			if(selectedOption == 0)
+			{
+				text = txt.getText();
+				if (text.length() > 1 ) {
+					hasName = true;
+					try {
+						client.setName(text);
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+					JOptionPane.showMessageDialog(mainFrame, "Bonjour " + text + '!');
+				}
+			}
+		}
+		
+		// Create the Main JFrame
+        mainFrame = new JFrame("Pay2Bid - Auction - "+text);
+        Dimension dimension = new Dimension(500, 500);
+        mainFrame.setSize(500, 500);
+        mainFrame.setMaximumSize(dimension);
+        mainFrame.setLayout(new BorderLayout());
 
 
 

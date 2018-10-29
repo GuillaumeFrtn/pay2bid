@@ -10,6 +10,6 @@ import com.alma.pay2bid.client.observer.INewAuctionObserver;
  */
 public interface INewAuctionObservable {
     boolean addNewAuctionObserver(INewAuctionObserver observer);
-
     boolean removeNewAuctionObserver(INewAuctionObserver observer);
+    void notifyNewAuctionObserver();
 }

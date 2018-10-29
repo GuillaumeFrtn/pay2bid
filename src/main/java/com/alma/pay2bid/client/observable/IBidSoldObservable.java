@@ -10,6 +10,6 @@ import com.alma.pay2bid.client.observer.IBidSoldObserver;
  */
 public interface IBidSoldObservable {
     boolean addBidSoldObserver(IBidSoldObserver observer);
-
     boolean removeBidSoldObserver(IBidSoldObserver observer);
+    void notifyBidSoldObserver();
 }

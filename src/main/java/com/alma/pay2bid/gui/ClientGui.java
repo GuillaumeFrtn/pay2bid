@@ -15,11 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -57,7 +53,7 @@ public class ClientGui {
         auctionList = new HashMap<UUID, AuctionView>();
         server.register(this.client);
 
-        client.addNewAuctionObserver(new INewAuctionObserver() {
+        server.getCurrentAuction().addNewAuctionObserver(new INewAuctionObserver() {
             @Override
             public void updateNewAuction(AuctionBean auction) {
                 LOGGER.info("A new auction needs to be added to the GUI");
@@ -73,7 +69,12 @@ public class ClientGui {
      * Initialize the GUI & populate it with the base elements
      */
     private void createGui() {
-        
+        // Create the Main JFrame
+        mainFrame = new JFrame("Pay2Bid - Auction");
+        Dimension dimension = new Dimension(500, 500);
+        mainFrame.setSize(500, 500);
+        mainFrame.setMaximumSize(dimension);
+        mainFrame.setLayout(new BorderLayout());
 
         // block pour définir le nom du client
         boolean hasName = false;
@@ -81,35 +82,27 @@ public class ClientGui {
         JPanel panel = new JPanel();
         JLabel lbl = new JLabel("Entrez votre nom: ");
         JTextField txt = new JTextField(10);
-        String text = "";
         panel.add(lbl);
         panel.add(txt);
 
-		while (hasName == false) {
-		
-			int selectedOption = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
-			
-			if(selectedOption == 0)
-			{
-				text = txt.getText();
-				if (text.length() > 1 ) {
-					hasName = true;
-					try {
-						client.setName(text);
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-					JOptionPane.showMessageDialog(mainFrame, "Bonjour " + text + '!');
-				}
-			}
-		}
-		
-		// Create the Main JFrame
-        mainFrame = new JFrame("Pay2Bid - Auction - "+text);
-        Dimension dimension = new Dimension(500, 500);
-        mainFrame.setSize(500, 500);
-        mainFrame.setMaximumSize(dimension);
-        mainFrame.setLayout(new BorderLayout());
+        while (hasName == false) {
+
+        int selectedOption = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
+
+        if(selectedOption == 0)
+        {
+        String text = txt.getText();
+          if (text.length() > 1 ) {
+            hasName = true;
+            try {
+              client.setName(text);
+            } catch (RemoteException e) {
+              e.printStackTrace();
+            }
+            JOptionPane.showMessageDialog(mainFrame, "Bonjour " + text + '!');
+          }
+        }
+      }
 
 
 
@@ -197,7 +190,7 @@ public class ClientGui {
 
 
             //Now add the observer to receive all price updates
-            client.addNewPriceObserver(new INewPriceObserver() {
+            auctionBean.addNewPriceObserver(new INewPriceObserver() {
                 @Override
                 public void updateNewPrice(UUID auctionID, Integer price) {
                     setAuctionPrice(auctionID, price);
@@ -208,7 +201,7 @@ public class ClientGui {
             });
 
             // Add a observer to receive the notification when the bid is sold
-            client.addBidSoldObserver(new IBidSoldObserver() {
+            auctionBean.addBidSoldObserver(new IBidSoldObserver() {
                 @Override
                 public void updateBidSold(IClient client) {
                     try {
@@ -219,7 +212,7 @@ public class ClientGui {
                 }
             });
 
-            client.addTimerObserver(new ITimerObserver() {
+            auctionBean.addTimerObserver(new ITimerObserver() {
                 @Override
                 public void updateTimer(String time) {
                     auction.setAuctionTimer(time);

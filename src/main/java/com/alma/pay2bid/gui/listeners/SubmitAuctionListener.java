@@ -2,6 +2,7 @@ package com.alma.pay2bid.gui.listeners;
 
 import com.alma.pay2bid.bean.AuctionBean;
 import com.alma.pay2bid.client.IClient;
+import com.alma.pay2bid.client.Client;
 import com.alma.pay2bid.gui.AuctionInput;
 import com.alma.pay2bid.gui.AuctionView;
 
@@ -29,6 +30,8 @@ public class SubmitAuctionListener implements ActionListener{
         try {
             // send the new auction to the server through the client
             AuctionBean a = new AuctionBean(Integer.parseInt(input.getAuctionPrice()), input.getAuctionName(), input.getDescription(), client.getName());
+            // la nouvelle enchère récupère la liste de tous les clients via le serveur, puis les notifie de sa présence
+
             client.submit(a);
 
 

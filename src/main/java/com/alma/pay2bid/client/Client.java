@@ -23,12 +23,12 @@ import java.util.logging.Logger;
  * @author Arnaud Grall
  * @author Thomas Minier
  */
-public class Client extends UnicastRemoteObject implements IClient, IBidSoldObservable, INewAuctionObservable, INewPriceObservable , ITimerObservable{
+public class Client extends UnicastRemoteObject implements IClient/*, IBidSoldObservable, INewAuctionObservable, INewPriceObservable , ITimerObservable*/{
 
     /**
      * A timer used to measure time between rounds
      */
-    private class TimerManager extends TimerTask {
+   /* private class TimerManager extends TimerTask {
         private String timeString;
         private long time = TIME_TO_RAISE_BID;
 
@@ -46,7 +46,7 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
                 			server.timeElapsed(Client.this);
                 		}
                 } else {
-                    for(ITimerObserver o : newTimerObservers){
+                    for(ITimerObserver o : server.getCurrentAuction().getTimerObserver()){
                         o.updateTimer(timeString);
                     }
                 }
@@ -64,7 +64,7 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
         public void setTimeString(String timeString) {
             this.timeString = timeString;
         }
-    }
+    }*/
 
     private static final Logger LOGGER = Logger.getLogger(Client.class.getCanonicalName());
     private static final long TIME_TO_RAISE_BID = 30000;
@@ -73,18 +73,18 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
     private ClientBean identity;
     private IServer server;
     private transient Timer timer;
-    private AuctionBean currentAuction;
+    //private AuctionBean currentAuction;
     private String name;
     private String timeElapsed;
     private ClientState state;
     private boolean estVendeur;
 
-    // collections of observers used to connect the client to the GUI
+    /* collections of observers used to connect the client to the GUI
     private transient Collection<ITimerObserver> newTimerObservers = new ArrayList<ITimerObserver>();
     private transient Collection<IBidSoldObserver> bidSoldObservers = new ArrayList<IBidSoldObserver>();
     private transient Collection<INewAuctionObserver> newAuctionObservers = new ArrayList<INewAuctionObserver>();
     private transient Collection<INewPriceObserver> newPriceObservers = new ArrayList<INewPriceObserver>();
-
+    */
     /**
      * To get a server reference:
      * <pre>
@@ -117,17 +117,17 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
         } else { 
     			this.setEstVendeur(false);
         }
-        currentAuction = auction;
+        //currentAuction = auction;
 
         timer = new Timer();
         timer.schedule(new TimerManager(timeElapsed),0, TIME_TO_REFRESH);
 
         state = ClientState.WAITING;
 
-        // notify the observers of the new auction
+        /* notify the observers of the new auction
         for (INewAuctionObserver observer : newAuctionObservers) {
             observer.updateNewAuction(auction);
-        }
+        }*/
     }
 
     /**
@@ -148,9 +148,9 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
      */
     @Override
     public void bidSold(IClient buyer) throws RemoteException {
-        LOGGER.info((buyer == null ? "nobody" : buyer.getName()) + " won " + currentAuction.getName());
+        LOGGER.info((buyer == null ? "nobody" : buyer.getName()) + " won " + server.getCurrentAuction().getName());
 
-        currentAuction = null;
+        //currentAuction = null;
 
         this.estVendeur = false;
 
@@ -160,7 +160,7 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
         state = ClientState.ENDING;
 
         // notify the observers of the new bid
-        for (IBidSoldObserver observer : bidSoldObservers) {
+        for (IBidSoldObserver observer : server.getCurrentAuction().getBidObserver()) {
         	if(buyer != null)
         		observer.updateBidSold(buyer);
         }
@@ -176,7 +176,7 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
     public void newPrice(UUID auctionID, int price) throws RemoteException {
         LOGGER.info("New price received for the current auction");
 
-        currentAuction.setPrice(price);
+        server.getCurrentAuction().setPrice(price);
 
         if(timer != null) {
             timer.cancel();
@@ -189,7 +189,7 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
         state = ClientState.WAITING;
 
         // notify the observers of the new price for the current auction
-        for (INewPriceObserver observer : newPriceObservers) {
+        for (INewPriceObserver observer : server.getCurrentAuction().getPriceObserver()) {
             observer.updateNewPrice(auctionID, price);
         }
     }
@@ -214,6 +214,11 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
     @Override
     public void setState(ClientState state) {
         this.state = state;
+    }
+    
+/*    public AuctionBean getAuction() {
+    	return currentAuction;
+    	
     }
 
     @Override
@@ -255,7 +260,7 @@ public class Client extends UnicastRemoteObject implements IClient, IBidSoldObse
     public boolean removeTimerObserver(ITimerObserver observer) {
         return newTimerObservers.remove(observer);
     }
-
+*/
     public boolean getEstVendeur(){
       return this.estVendeur;
     }

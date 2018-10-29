@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
+import com.alma.pay2bid.client.IClient;
 import com.alma.pay2bid.client.observable.IBidSoldObservable;
 import com.alma.pay2bid.client.observable.INewAuctionObservable;
 import com.alma.pay2bid.client.observable.INewPriceObservable;
@@ -12,6 +13,8 @@ import com.alma.pay2bid.client.observer.IBidSoldObserver;
 import com.alma.pay2bid.client.observer.INewAuctionObserver;
 import com.alma.pay2bid.client.observer.INewPriceObserver;
 import com.alma.pay2bid.client.observer.ITimerObserver;
+
+import java.util.*;
 
 /**
  * AuctionBean represent an auction, ie an item sold by a client
@@ -25,7 +28,7 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
     private String name;
     private String description;
     private String vendeur;
-    
+    List<IClient> clients;
     
     private transient Collection<ITimerObserver> newTimerObservers = new ArrayList<ITimerObserver>();
     private transient Collection<IBidSoldObserver> bidSoldObservers = new ArrayList<IBidSoldObserver>();
@@ -33,12 +36,13 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
     private transient Collection<INewPriceObserver> newPriceObservers = new ArrayList<INewPriceObserver>();
     
     
-    public AuctionBean(int price, String name, String description, String vendeur) {
+    public AuctionBean(int price, String name, String description, String vendeur, List<IClient> clients) {
     	if (price > 0) this.price = price;
     	else this.price = 0;
         this.name = name;
         this.description = description;
         this.vendeur = vendeur;
+        this.clients = clients;
         for (INewAuctionObserver observer : newAuctionObservers) {
             observer.updateNewAuction(this);
         }
@@ -128,20 +132,4 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
 	public void setVendeur(String vendeur) {
 		this.vendeur = vendeur;
 	}
-    
-    public Collection<ITimerObserver> getTimerObserver(){
-    	return newTimerObservers;
-    }
-    
-    public Collection<INewAuctionObserver> getAuctionObserver(){
-    	return newAuctionObservers;
-    }
-    
-    public Collection<IBidSoldObserver> getBidObserver(){
-    	return bidSoldObservers;
-    }
-    
-    public Collection<INewPriceObserver> getPriceObserver(){
-    	return newPriceObservers;
-    }
 }

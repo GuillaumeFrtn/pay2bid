@@ -4,7 +4,6 @@ import com.alma.pay2bid.client.Client;
 import com.alma.pay2bid.gui.ClientGui;
 import com.alma.pay2bid.server.IServer;
 import com.alma.pay2bid.server.Server;
-
 import org.apache.commons.cli.*;
 
 import java.rmi.ConnectException;

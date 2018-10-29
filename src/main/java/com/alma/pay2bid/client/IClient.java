@@ -44,7 +44,7 @@ public interface IClient extends Remote, Serializable {
      * @throws RemoteException
      */
     String getName() throws RemoteException;
-
+    
     void setName(String name) throws RemoteException;
 
     ClientState getState() throws RemoteException;

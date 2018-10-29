@@ -57,7 +57,7 @@ public class Server extends UnicastRemoteObject implements IServer {
     private Queue<AuctionBean> auctions = new LinkedList<AuctionBean>();
     private HashMap<IClient, Integer> bidByClient = new HashMap<IClient, Integer>();
 
-    private static final int MIN_NUMBER_CLIENTS = 1;
+    private static final int MIN_NUMBER_CLIENTS = 2;
 
     /**
      * Constructor
@@ -209,7 +209,9 @@ public class Server extends UnicastRemoteObject implements IServer {
             }
         }
     }
-    
+    public List<IClient> getClients(){
+    	return clients;
+    }
     public AuctionBean getCurrentAuction() throws RemoteException{
     	return currentAuction;
     }

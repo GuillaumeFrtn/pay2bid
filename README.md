@@ -1,4 +1,3 @@
-<<<<<<< HEAD
  # Middleware Project - Pay2bid
 Distributed auction house application - Middleware project, M2 ALMA 2016/2017   
 **Auteurs** : Alexis Giraudet, Arnaud Grall, Thomas Minier
@@ -45,7 +44,3 @@ java -jar target/pay2bid-1.0-SNAPSHOT-jar-with-dependencies.jar
 - [x] Erreur quand les clients raise un prix inférieur à celui en cours
 - [x] estVendeur géré uniquement localement si plusieurs enchères dans la queue on ne sait plus qui est vendeur 
 
-=======
-# pay2bid
-upgrade of an existing project
->>>>>>> refs/remotes/origin/master

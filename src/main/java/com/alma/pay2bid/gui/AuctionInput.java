@@ -2,6 +2,7 @@ package com.alma.pay2bid.gui;
 
 import com.alma.pay2bid.client.IClient;
 import com.alma.pay2bid.gui.listeners.SubmitAuctionListener;
+import com.alma.pay2bid.server.IServer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ public class AuctionInput extends JPanel {
     private JTextField  description;
     private JLabel statusLabel;
 
-    public AuctionInput(IClient client) {
+    public AuctionInput(ClientGui gui) {
         setLayout(new GridLayout(4,3,5,5));
 
         // Frame used to displayed the input
@@ -50,7 +51,7 @@ public class AuctionInput extends JPanel {
         // Validation button
         JButton auctionSend = new JButton("SEND NEW AUCTION");
         auctionSend.setActionCommand("newAuction");
-        auctionSend.addActionListener(new SubmitAuctionListener(client, this));
+        auctionSend.addActionListener(new SubmitAuctionListener(gui, this));
 
         // add all the elements to the panel
         add(nameLabel);

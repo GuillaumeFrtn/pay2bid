@@ -1,6 +1,7 @@
 package com.alma.pay2bid.gui;
 
 import com.alma.pay2bid.bean.AuctionBean;
+import com.alma.pay2bid.bean.ClientBean;
 import com.alma.pay2bid.client.Client;
 import com.alma.pay2bid.client.IClient;
 import com.alma.pay2bid.client.observer.IBidSoldObserver;
@@ -31,7 +32,7 @@ import static java.lang.System.exit;
 public class ClientGui {
 
     private static final Logger LOGGER = Logger.getLogger(ClientGui.class.getCanonicalName());
-    private Client client;
+    private IClient client;
     private IServer server;
     private HashMap<UUID, AuctionView> auctionList;
 
@@ -68,41 +69,43 @@ public class ClientGui {
     /**
      * Initialize the GUI & populate it with the base elements
      */
-    private void createGui() {
+	private void createGui() {
+		
+	    // block pour definir le nom du client
+	    boolean hasName = false;
+	    String[] options = {"OK"};
+	    JPanel panel = new JPanel();
+	    JLabel lbl = new JLabel("Entrez votre nom: ");
+	    JTextField txt = new JTextField(10);
+	    panel.add(lbl);
+	    panel.add(txt);
+	    String name = "";
+	
+	    while (hasName == false) {
+	
+		    int selectedOption = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
+		
+			if(selectedOption == 0)
+			{
+				name = txt.getText();
+				if (name.length() > 1 ) {
+					hasName = true;
+					try {
+						client.setName(name);
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+					JOptionPane.showMessageDialog(mainFrame, "Bonjour " + name + '!');
+				}
+			}
+		}
+        
         // Create the Main JFrame
-        mainFrame = new JFrame("Pay2Bid - Auction");
-        Dimension dimension = new Dimension(500, 500);
-        mainFrame.setSize(500, 500);
-        mainFrame.setMaximumSize(dimension);
-        mainFrame.setLayout(new BorderLayout());
-
-        // block pour définir le nom du client
-        boolean hasName = false;
-        String[] options = {"OK"};
-        JPanel panel = new JPanel();
-        JLabel lbl = new JLabel("Entrez votre nom: ");
-        JTextField txt = new JTextField(10);
-        panel.add(lbl);
-        panel.add(txt);
-
-        while (hasName == false) {
-
-        int selectedOption = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
-
-        if(selectedOption == 0)
-        {
-        String text = txt.getText();
-          if (text.length() > 1 ) {
-            hasName = true;
-            try {
-              client.setName(text);
-            } catch (RemoteException e) {
-              e.printStackTrace();
-            }
-            JOptionPane.showMessageDialog(mainFrame, "Bonjour " + text + '!');
-          }
-        }
-      }
+		mainFrame = new JFrame("Pay2Bid - Auction - " + name);
+		Dimension dimension = new Dimension(500, 500);
+		mainFrame.setSize(500, 500);
+		mainFrame.setMaximumSize(dimension);
+		mainFrame.setLayout(new BorderLayout());
 
 
 
@@ -179,7 +182,7 @@ public class ClientGui {
 
             JButton raiseBidButton = new JButton("Raise the bid");
             raiseBidButton.setActionCommand("raiseBid");
-            raiseBidButton.addActionListener(new RaiseBidButtonListener(client, client.getServer(), auction, statusLabel));
+            raiseBidButton.addActionListener(new RaiseBidButtonListener(client, server, auction, statusLabel)); // getServer -> server
             if (this.client.getEstVendeur()) {
               raiseBidButton.setEnabled(false);
               raiseBidButton.setVisible(false);
@@ -258,7 +261,19 @@ public class ClientGui {
      * Create the menu to add a new Auction
      */
     public void newAuctionView() {
-        AuctionInput input = new AuctionInput(client);
+        AuctionInput input = new AuctionInput(this);
         input.showFrame();
+    }
+    
+    public IServer getServer() {
+    	return server;
+    }
+    
+    public IClient getClient() {
+    	return client;
+    }
+    
+    public void submit(AuctionBean auction) throws RemoteException {
+    	client.submit(auction, server);
     }
 }

@@ -5,6 +5,7 @@ import com.alma.pay2bid.client.IClient;
 import com.alma.pay2bid.client.Client;
 import com.alma.pay2bid.gui.AuctionInput;
 import com.alma.pay2bid.gui.AuctionView;
+import com.alma.pay2bid.gui.ClientGui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,11 +18,11 @@ import java.awt.event.ActionListener;
  */
 public class SubmitAuctionListener implements ActionListener{
     private AuctionView auction;
-    private IClient client;
+    private ClientGui gui;
     private AuctionInput input;
 
-    public SubmitAuctionListener(IClient c, AuctionInput input) {
-        this.client = c;
+    public SubmitAuctionListener(ClientGui gui, AuctionInput input) {
+        this.gui = gui;
         this.input = input;
     }
 
@@ -29,10 +30,10 @@ public class SubmitAuctionListener implements ActionListener{
     public void actionPerformed(ActionEvent actionEvent) {
         try {
             // send the new auction to the server through the client
-            AuctionBean a = new AuctionBean(Integer.parseInt(input.getAuctionPrice()), input.getAuctionName(), input.getDescription(), client.getName());
+            AuctionBean a = new AuctionBean(Integer.parseInt(input.getAuctionPrice()), input.getAuctionName(), input.getDescription(), gui.getClient().getName(), null);
             // la nouvelle enchère récupère la liste de tous les clients via le serveur, puis les notifie de sa présence
 
-            client.submit(a);
+            gui.submit(a);
 
 
             // close the menu & refresh the status label

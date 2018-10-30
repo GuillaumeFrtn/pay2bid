@@ -1,6 +1,8 @@
 package com.alma.pay2bid.client;
 
 import com.alma.pay2bid.bean.AuctionBean;
+import com.alma.pay2bid.gui.ClientGui;
+import com.alma.pay2bid.server.IServer;
 
 import java.io.Serializable;
 import java.rmi.Remote;
@@ -24,13 +26,13 @@ public interface IClient extends Remote, Serializable {
      * @param auction
      * @throws RemoteException
      */
-    void submit(AuctionBean auction) throws RemoteException;
+    void submit(AuctionBean auction, IServer server) throws RemoteException;
 
     /**
      * @param buyer
      * @throws RemoteException
      */
-    void bidSold(IClient buyer) throws RemoteException;
+    void bidSold(IClient buyer, IServer server) throws RemoteException;
 
     /**
      * @param auctionID
@@ -52,4 +54,6 @@ public interface IClient extends Remote, Serializable {
     void setState(ClientState newState) throws RemoteException;
 
     void setEstVendeur(boolean v) throws RemoteException;
+
+	boolean getEstVendeur();
 }

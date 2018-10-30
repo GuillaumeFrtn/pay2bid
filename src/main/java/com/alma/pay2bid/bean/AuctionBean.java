@@ -1,9 +1,6 @@
 package com.alma.pay2bid.bean;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-
+import com.alma.pay2bid.client.Client;
 import com.alma.pay2bid.client.IClient;
 import com.alma.pay2bid.client.observable.IBidSoldObservable;
 import com.alma.pay2bid.client.observable.INewAuctionObservable;
@@ -14,6 +11,7 @@ import com.alma.pay2bid.client.observer.INewAuctionObserver;
 import com.alma.pay2bid.client.observer.INewPriceObserver;
 import com.alma.pay2bid.client.observer.ITimerObserver;
 
+import java.rmi.RemoteException;
 import java.util.*;
 
 /**
@@ -23,12 +21,60 @@ import java.util.*;
  * @author Thomas Minier
  */
 public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObservable, INewPriceObservable , ITimerObservable {
+	
+	/**
+     * A timer used to measure time between rounds
+     */
+	private class TimerManager extends TimerTask {
+        private String timeString;
+        private long time = TIME_TO_RAISE_BID;
+
+        public TimerManager(String timeMessage){
+            this.timeString = timeMessage;
+        }
+
+        @Override
+        public void run() {
+            try {
+                time -=TIME_TO_REFRESH;
+                timeString = Long.toString(time/1000);
+                if(time == 0) {
+                		if (!Client.this.estVendeur) { // utilité ?
+                			server.timeElapsed(Client.this); // timeElapsed à deplacer ici
+                		}
+                } else {
+                	// à remplacer par notify
+                    for(ITimerObserver o : server.getCurrentAuction().getTimerObserver()){
+                        o.updateTimer(timeString);
+                    }
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public String getTimeString() {
+            return timeString;
+        }
+
+        public void setTimeString(String timeString) {
+            this.timeString = timeString;
+        }
+    }
+	
     private UUID uuid;
     private int price;
     private String name;
     private String description;
     private String vendeur;
     List<IClient> clients;
+    private transient Timer timer;
+    private String timeElapsed;
+    
+    private static final long TIME_TO_RAISE_BID = 30000;
+    private static final long TIME_TO_REFRESH = 1000;
     
     private transient Collection<ITimerObserver> timerObservers = new ArrayList<ITimerObserver>();
     private transient Collection<IBidSoldObserver> bidSoldObservers = new ArrayList<IBidSoldObserver>();
@@ -45,9 +91,6 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
         this.clients = clients;
         notifyNewAuctionObserver();
     }
-
-    
-    
 		
     @Override
     public boolean addNewPriceObserver(INewPriceObserver observer) {

@@ -189,9 +189,7 @@ public class Client extends UnicastRemoteObject implements IClient/*, IBidSoldOb
         state = ClientState.WAITING;
 
         // notify the observers of the new price for the current auction
-        for (INewPriceObserver observer : server.getCurrentAuction().getPriceObserver()) {
-            observer.updateNewPrice(auctionID, price);
-        }
+        server.getCurrentAuction().notifyNewPriceObserver();
     }
 
     public IServer getServer(){ return server;}

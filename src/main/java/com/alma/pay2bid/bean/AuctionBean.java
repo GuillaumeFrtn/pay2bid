@@ -30,7 +30,7 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
     private String vendeur;
     List<IClient> clients;
     
-    private transient Collection<ITimerObserver> newTimerObservers = new ArrayList<ITimerObserver>();
+    private transient Collection<ITimerObserver> timerObservers = new ArrayList<ITimerObserver>();
     private transient Collection<IBidSoldObserver> bidSoldObservers = new ArrayList<IBidSoldObserver>();
     private transient Collection<INewAuctionObserver> newAuctionObservers = new ArrayList<INewAuctionObserver>();
     private transient Collection<INewPriceObserver> newPriceObservers = new ArrayList<INewPriceObserver>();
@@ -43,9 +43,7 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
         this.description = description;
         this.vendeur = vendeur;
         this.clients = clients;
-        for (INewAuctionObserver observer : newAuctionObservers) {
-            observer.updateNewAuction(this);
-        }
+        notifyNewAuctionObserver();
     }
 
     
@@ -131,5 +129,34 @@ public class AuctionBean implements IBean, IBidSoldObservable, INewAuctionObserv
 
 	public void setVendeur(String vendeur) {
 		this.vendeur = vendeur;
+	}
+
+	@Override
+	public void notifyTimerObserver() {
+		for(ITimerObserver o : timerObservers){
+            o.updateTimer(timeString);
+        }
+	}
+
+	@Override
+	public void notifyNewPriceObserver() {
+		for (INewPriceObserver observer : newPriceObservers) {
+            observer.updateNewPrice(uuid, price);
+        }
+	}
+
+	@Override
+	public void notifyNewAuctionObserver() {
+		for (INewAuctionObserver observer : newAuctionObservers) {
+            observer.updateNewAuction(this);
+        }
+	}
+
+	@Override
+	public void notifyBidSoldObserver() {
+		for (IBidSoldObserver observer : bidSoldObservers) {
+        	if(winner != null)
+        		observer.updateBidSold(winner);
+        }
 	}
 }
